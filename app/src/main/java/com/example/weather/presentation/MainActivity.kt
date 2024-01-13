@@ -1,10 +1,9 @@
-package com.example.weather
+package com.example.weather.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.weather.ui.theme.WeatherTheme
-import kotlinx.serialization.Serializable
+import com.example.weather.presentation.ui.theme.WeatherTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
