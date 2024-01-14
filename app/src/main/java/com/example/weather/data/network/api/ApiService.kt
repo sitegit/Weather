@@ -1,8 +1,8 @@
 package com.example.weather.data.network.api
 
-import com.example.weather.data.network.model.CityDto
-import com.example.weather.data.network.model.WeatherCurrentDto
-import com.example.weather.data.network.model.WeatherForecastDto
+import com.example.weather.data.network.dto.CityDto
+import com.example.weather.data.network.dto.WeatherCurrentDto
+import com.example.weather.data.network.dto.WeatherForecastDto
 import retrofit2.http.GET
 import retrofit2.http.Query
 

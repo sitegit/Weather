@@ -33,6 +33,7 @@ decompose-core = { group = "com.arkivanov.decompose", name = "decompose", versio
 decompose-jetpack = { group = "com.arkivanov.decompose", name = "extensions-compose-jetpack", version.ref = "decompose" }
 room-core = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 dagger-core = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
 glide-compose = { group = "com.github.bumptech.glide", name = "compose", version.ref = "glide" }

@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.decompose.jetpack)
     //Room
     implementation(libs.room.core)
+    implementation(libs.room.ktx)
     ksp(libs.room.compiler)
     //Dagger
     implementation(libs.dagger.core)
