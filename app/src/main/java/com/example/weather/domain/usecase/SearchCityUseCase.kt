@@ -8,5 +8,5 @@ class SearchCityUseCase @Inject constructor(
     private val repository: SearchRepository
 ) {
 
-    operator fun invoke(query: String): List<City> = repository.search(query)
+    suspend operator fun invoke(query: String): List<City> = repository.search(query)
 }
