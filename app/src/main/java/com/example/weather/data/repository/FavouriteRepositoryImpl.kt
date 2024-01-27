@@ -3,7 +3,6 @@ package com.example.weather.data.repository
 import com.example.weather.data.local.db.FavouriteCitiesDao
 import com.example.weather.data.mapper.toDbModel
 import com.example.weather.data.mapper.toEntities
-import com.example.weather.data.mapper.toEntity
 import com.example.weather.domain.entity.City
 import com.example.weather.domain.repository.FavouriteRepository
 import kotlinx.coroutines.flow.Flow
