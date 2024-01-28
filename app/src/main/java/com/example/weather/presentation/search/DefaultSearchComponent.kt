@@ -5,7 +5,7 @@ import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import com.example.weather.domain.entity.City
-import com.example.weather.presentation.extentons.componentScope
+import com.example.weather.presentation.utils.componentScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -14,15 +14,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class DefaultSearchComponent @AssistedInject constructor(
-    private val searchStoreFactory: SearchStoreFactory,
+    private val storeFactory: SearchStoreFactory,
     @Assisted("openReason") private val openReason: OpenReason,
-    @Assisted("onClickedBack") private val onClickedBack: () -> Unit,
+    @Assisted("onBackClicked") private val onBackClicked: () -> Unit,
     @Assisted("onCitySavedToFavourite") private val onCitySavedToFavourite: () -> Unit,
     @Assisted("onForecastForCityRequested") private val onForecastForCityRequested: (City) -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : SearchComponent, ComponentContext by componentContext {
 
-    private val store = instanceKeeper.getStore { searchStoreFactory.create(openReason) }
+    private val store = instanceKeeper.getStore { storeFactory.create(openReason) }
     private val scope = componentScope()
 
     init {
@@ -30,11 +30,13 @@ class DefaultSearchComponent @AssistedInject constructor(
             store.labels.collect {
                 when (it) {
                     SearchStore.Label.ClickBack -> {
-                        onClickedBack()
+                        onBackClicked()
                     }
+
                     is SearchStore.Label.OpenForecast -> {
                         onForecastForCityRequested(it.city)
                     }
+
                     SearchStore.Label.SavedToFavourite -> {
                         onCitySavedToFavourite()
                     }
@@ -64,10 +66,9 @@ class DefaultSearchComponent @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-
         fun create(
             @Assisted("openReason") openReason: OpenReason,
-            @Assisted("onClickedBack") onClickedBack: () -> Unit,
+            @Assisted("onBackClicked") onBackClicked: () -> Unit,
             @Assisted("onCitySavedToFavourite") onCitySavedToFavourite: () -> Unit,
             @Assisted("onForecastForCityRequested") onForecastForCityRequested: (City) -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext

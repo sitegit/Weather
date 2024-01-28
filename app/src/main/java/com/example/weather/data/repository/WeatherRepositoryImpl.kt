@@ -5,7 +5,6 @@ import com.example.weather.data.network.api.ApiService
 import com.example.weather.domain.entity.Forecast
 import com.example.weather.domain.entity.Weather
 import com.example.weather.domain.repository.WeatherRepository
-import com.example.weather.domain.usecase.GetCurrentWeatherUseCase
 import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(

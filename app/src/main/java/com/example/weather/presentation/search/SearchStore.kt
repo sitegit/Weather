@@ -114,12 +114,13 @@ class SearchStoreFactory @Inject constructor(
                                 publish(Label.SavedToFavourite)
                             }
                         }
+
                         OpenReason.RegularSearch -> {
                             publish(Label.OpenForecast(intent.city))
                         }
                     }
-                    publish(Label.SavedToFavourite)
                 }
+
                 Intent.ClickSearch -> {
                     searchJob?.cancel()
                     searchJob = scope.launch {

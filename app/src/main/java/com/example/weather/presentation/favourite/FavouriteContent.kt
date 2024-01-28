@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -44,16 +43,19 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.weather.R
-import com.example.weather.presentation.extentons.tempToFormattedString
+import com.example.weather.presentation.utils.tempToFormattedString
 import com.example.weather.presentation.ui.theme.CardGradients
 import com.example.weather.presentation.ui.theme.Gradient
 import com.example.weather.presentation.ui.theme.Orange
+import com.example.weather.presentation.ui.theme.StatusBarTextColor
 
 @Composable
 fun FavouriteContent(
     component: FavouriteComponent
 ) {
     val state by component.model.collectAsState()
+
+    StatusBarTextColor(isLight = true, decorFitsSystemWindow = true)
 
     LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
@@ -103,7 +105,6 @@ private fun CityCard(
                 spotColor = gradient.shadowColor,
                 shape = MaterialTheme.shapes.extraLarge
             ),
-        colors = CardDefaults.cardColors(containerColor = Color.Blue),
         shape = MaterialTheme.shapes.extraLarge
     ) {
         Box(
@@ -228,7 +229,7 @@ private fun SearchCard(
             Text(
                 text = stringResource(R.string.search),
                 color = MaterialTheme.colorScheme.background,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(end = 16.dp)
             )
         }
     }

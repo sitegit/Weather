@@ -28,63 +28,57 @@ class DefaultRootComponent @AssistedInject constructor(
 
     override val stack: Value<ChildStack<*, RootComponent.Child>> = childStack(
         source = navigation,
+        handleBackButton = true,
         serializer = Config.serializer(),
         initialConfiguration = Config.Favourite,
-        handleBackButton = true,
         childFactory = ::child
     )
 
     private fun child(
-        config: Config,
-        componentContext: ComponentContext
+        config: Config, componentContext: ComponentContext
     ): RootComponent.Child {
         return when (config) {
             is Config.Details -> {
                 val component = detailsComponentFactory.create(
-                    city = config.city,
-                    onBackClicked = {
+                    city = config.city, onBackClicked = {
                         navigation.pop()
-                    },
-                    componentContext = componentContext
+                    }, componentContext = componentContext
                 )
                 RootComponent.Child.Details(component)
             }
+
             Config.Favourite -> {
                 val component = favouriteComponentFactory.create(
                     onCityItemClicked = {
                         navigation.push(Config.Details(it))
-                    },
-                    onAddFavouriteClicked = {
+                    }, onAddFavouriteClicked = {
                         navigation.push(Config.Search(OpenReason.AddToFavourite))
-                    },
-                    onSearchClicked = {
+                    }, onSearchClicked = {
                         navigation.push(Config.Search(OpenReason.RegularSearch))
-                    },
-                    componentContext = componentContext
+                    }, componentContext = componentContext
                 )
                 RootComponent.Child.Favourite(component)
             }
+
             is Config.Search -> {
-                val component = searchComponentFactory.create(
-                    openReason = config.openReason,
-                    onClickedBack = {
-                        navigation.pop()
-                    },
-                    onCitySavedToFavourite = {
-                        navigation.pop()
-                    },
-                    onForecastForCityRequested = {
-                        navigation.push(Config.Details(it))
-                    },
-                    componentContext = componentContext
-                )
+                val component =
+                    searchComponentFactory.create(
+                        openReason = config.openReason,
+                        onBackClicked = {
+                            navigation.pop()
+                        }, onCitySavedToFavourite = {
+                            navigation.pop()
+                        }, onForecastForCityRequested = {
+                            navigation.push(Config.Details(it))
+                        }, componentContext = componentContext
+                    )
                 RootComponent.Child.Search(component)
             }
         }
     }
 
     @Serializable
-    private sealed interface Config {
+    sealed interface Config {
 
         @Serializable
         data object Favourite : Config
@@ -98,7 +92,6 @@ class DefaultRootComponent @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-
         fun create(
             @Assisted("componentContext") componentContext: ComponentContext
         ): DefaultRootComponent

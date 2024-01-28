@@ -10,8 +10,9 @@ import com.example.weather.presentation.search.SearchContent
 fun RootContent(
     component: RootComponent
 ) {
-    
-    Children(stack = component.stack) {
+    Children(
+        stack = component.stack
+    ) {
         when (val instance = it.instance) {
             is RootComponent.Child.Details -> {
                 DetailsContent(component = instance.component)
