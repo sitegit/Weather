@@ -1,6 +1,5 @@
 package com.example.weather.presentation.search
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,8 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarColors
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,7 +60,9 @@ fun SearchContent(component: SearchComponent) {
         onQueryChange = { component.changeSearchQuery(it) },
         onSearch = { component.onClickSearch() },
         active = true,
-        onActiveChange = {},
+        onActiveChange = {
+            if (!it) component.onClickBack()
+        },
         leadingIcon = {
             IconButton(onClick = { component.onClickBack() }) {
                 Icon(
