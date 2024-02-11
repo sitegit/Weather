@@ -2,6 +2,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -19,6 +21,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val key = property("apikey")?.toString() ?: error(
+            "Api key was not found, it must be added to gradle.properties"
+        )
+
+        buildConfigField("String", "WEATHER_API_KEY", "\"$key\"")
     }
 
     buildTypes {
@@ -39,9 +47,10 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.7"
     }
     packaging {
         resources {
@@ -60,6 +69,31 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.compose.material)
+    //MVIKotlin
+    implementation(libs.mvikotlin.core)
+    implementation(libs.mvikotlin.main)
+    implementation(libs.mvikotlin.coroutines)
+    //Decompose
+    implementation(libs.decompose.core)
+    implementation(libs.decompose.jetpack)
+    //Room
+    implementation(libs.room.core)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    //Dagger
+    implementation(libs.dagger.core)
+    ksp(libs.dagger.compiler)
+    //Glide
+    implementation(libs.glide.compose)
+    //Retrofit
+    implementation(libs.retorfit.core)
+    implementation(libs.retorfit.gsonConverter)
+    //Material icons
+    implementation(libs.icons)
+    //Serialization json
+    implementation(libs.serialization.json)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
