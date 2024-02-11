@@ -12,4 +12,6 @@ interface FavouriteComponent {
     fun onClickAddFavourite()
 
     fun onCityItemClick(city: City)
+
+    fun refresh()
 }

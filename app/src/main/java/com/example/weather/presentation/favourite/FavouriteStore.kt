@@ -11,6 +11,9 @@ import com.example.weather.domain.usecase.GetFavouriteCitiesUseCase
 import com.example.weather.presentation.favourite.FavouriteStore.Intent
 import com.example.weather.presentation.favourite.FavouriteStore.Label
 import com.example.weather.presentation.favourite.FavouriteStore.State
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,10 +26,13 @@ interface FavouriteStore : Store<Intent, State, Label> {
         data object ClickToFavourite : Intent
 
         data class CityItemClicked(val city: City) : Intent
+
+        data object RefreshListCities : Intent
     }
 
     data class State(
-        val cityItems: List<CityItem>
+        val cityItems: List<CityItem>,
+        val isRefreshing: Boolean
     ) {
 
         data class CityItem(
@@ -65,7 +71,7 @@ class FavouriteStoreFactory @Inject constructor(
     fun create(): FavouriteStore =
         object : FavouriteStore, Store<Intent, State, Label> by storeFactory.create(
             name = "FavouriteStore",
-            initialState = State(listOf()),
+            initialState = State(listOf(), false),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl
@@ -93,6 +99,8 @@ class FavouriteStoreFactory @Inject constructor(
         data class WeatherIsLoading(
             val cityId: Int
         ) : Msg
+
+        data class RefreshCities(val isRefreshing: Boolean) : Msg
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
@@ -113,6 +121,8 @@ class FavouriteStoreFactory @Inject constructor(
                 Intent.ClickSearch -> publish(Label.ClickSearch)
 
                 Intent.ClickToFavourite -> publish(Label.ClickToFavourite)
+
+                Intent.RefreshListCities -> refreshListCities()
             }
         }
 
@@ -127,6 +137,17 @@ class FavouriteStoreFactory @Inject constructor(
                         }
                     }
                 }
+            }
+        }
+
+        private fun refreshListCities() {
+            scope.launch {
+                dispatch(Msg.RefreshCities(true))
+                val weatherRequests = getFavouriteCitiesUseCase().first().map { city ->
+                    async { loadWeatherForCity(city) }
+                }
+                weatherRequests.awaitAll()
+                dispatch(Msg.RefreshCities(false))
             }
         }
 
@@ -199,6 +220,10 @@ class FavouriteStoreFactory @Inject constructor(
                         }
                     }
                 )
+            }
+
+            is Msg.RefreshCities -> {
+                copy(isRefreshing = msg.isRefreshing)
             }
         }
     }

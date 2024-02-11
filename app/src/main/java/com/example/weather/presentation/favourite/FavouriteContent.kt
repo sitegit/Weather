@@ -1,5 +1,6 @@
 package com.example.weather.presentation.favourite
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,13 +16,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,47 +47,66 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.weather.R
-import com.example.weather.presentation.utils.tempToFormattedString
+import com.example.weather.domain.entity.City
+import com.example.weather.presentation.favourite.FavouriteStore.State
+import com.example.weather.presentation.favourite.FavouriteStore.State.CityItem
 import com.example.weather.presentation.ui.theme.CardGradients
 import com.example.weather.presentation.ui.theme.Gradient
 import com.example.weather.presentation.ui.theme.Orange
 import com.example.weather.presentation.ui.theme.StatusBarTextColor
+import com.example.weather.presentation.utils.tempToFormattedString
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FavouriteContent(
     component: FavouriteComponent
 ) {
     val state by component.model.collectAsState()
+    val refreshing = state.isRefreshing
+    val pullRefreshState = rememberPullRefreshState(refreshing, { component.refresh() })
 
     StatusBarTextColor(isLight = true, decorFitsSystemWindow = true)
+    Column {
+        SearchCard(onClick = { component.onClickSearch() })
+        Box(Modifier.pullRefresh(pullRefreshState)) {
+            ListContent(
+                items = { state.cityItems },
+                onCityItemClick = { component.onCityItemClick(it) },
+                onClickAddFavourite = { component.onClickAddFavourite() }
+            )
+            PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
+        }
+    }
+}
 
+@Composable
+fun ListContent(
+    items: () -> List<CityItem>,
+    onCityItemClick: (City) -> Unit,
+    onClickAddFavourite: () -> Unit
+) {
     LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item(span = { GridItemSpan(2) } ) {
-            SearchCard(
-                onClick = { component.onClickSearch() }
-            )
-        }
         itemsIndexed(
-            items = state.cityItems,
+            items = items(),
             key = { _, item ->
                 item.city.id
             }
-        ) {index, item ->
+        ) { index, item ->
             CityCard(
                 cityItem = item,
                 index = index,
-                onClick = { component.onCityItemClick(item.city) }
+                onClick = { onCityItemClick(item.city) }
             )
         }
         item {
             AddFavouriteCityCard(
-                onClick = { component.onClickAddFavourite() }
+                onClick = onClickAddFavourite
             )
         }
     }
@@ -92,7 +115,7 @@ fun FavouriteContent(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun CityCard(
-    cityItem: FavouriteStore.State.CityItem,
+    cityItem: CityItem,
     index: Int,
     onClick: () -> Unit
 ) {
@@ -126,7 +149,7 @@ private fun CityCard(
                 .padding(24.dp)
         ) {
             when (val weatherState = cityItem.weatherState) {
-                FavouriteStore.State.WeatherState.Error -> {
+                State.WeatherState.Error -> {
                     Text(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -135,8 +158,8 @@ private fun CityCard(
                         color = MaterialTheme.colorScheme.background
                     )
                 }
-                FavouriteStore.State.WeatherState.Initial -> {}
-                is FavouriteStore.State.WeatherState.Loaded -> {
+                State.WeatherState.Initial -> {}
+                is State.WeatherState.Loaded -> {
                     GlideImage(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
@@ -150,10 +173,10 @@ private fun CityCard(
                             .padding(bottom = 24.dp),
                         text = weatherState.temp.tempToFormattedString(),
                         color = MaterialTheme.colorScheme.background,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 48.sp)
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 44.sp)
                     )
                 }
-                FavouriteStore.State.WeatherState.Loading -> {
+                State.WeatherState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
                         color = MaterialTheme.colorScheme.background
@@ -211,6 +234,7 @@ private fun SearchCard(
 ) {
     val gradient = CardGradients.gradients[3]
     Card(
+        modifier = Modifier.padding(16.dp),
         shape = CircleShape
     ) {
         Row(

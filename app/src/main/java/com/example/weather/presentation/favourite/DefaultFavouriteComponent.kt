@@ -57,6 +57,10 @@ class DefaultFavouriteComponent @AssistedInject constructor(
         store.accept(FavouriteStore.Intent.CityItemClicked(city))
     }
 
+    override fun refresh() {
+        store.accept(FavouriteStore.Intent.RefreshListCities)
+    }
+
     @AssistedFactory
     interface Factory {
 

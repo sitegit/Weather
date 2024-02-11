@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.compose.material)
     //MVIKotlin
     implementation(libs.mvikotlin.core)
     implementation(libs.mvikotlin.main)
